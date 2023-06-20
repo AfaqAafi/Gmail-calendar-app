@@ -6,12 +6,36 @@ import { useState } from "react";
 import SearchBarCompoent from "./SearchBarCompoent";
 import SearchIcon from "@mui/icons-material/Search";
 import ProfileComponent from "./ProfileComponent";
+import useGlobalContext from "../../context/GlobalContext";
+import dayjs from "dayjs";
+
 const CalenderHeader = () => {
-   const [mmddyy, setMmddyy] = useState('');
-   const[searchMeet, setSearchMeet] = useState(false);
-   const handleChange = (event) => {
-     setMmddyy(event.target.value);
-   };
+  const [mmddyy, setMmddyy] = useState("");
+  const [searchMeet, setSearchMeet] = useState(false);
+  const { isOpenSidebar, setIsOpenSidebar } = useGlobalContext();
+  const { monthIndex, setMonthIndex } = useGlobalContext();
+
+  const handelIncrement = () => {
+    setMonthIndex(monthIndex + 1);
+  };
+  const handelDecrement = () => {
+    setMonthIndex(monthIndex - 1);
+  };
+
+  const handleChange = (event) => {
+    setMmddyy(event.target.value);
+  };
+  const handleSidebarToggle = () => {
+    setIsOpenSidebar(!isOpenSidebar);
+  };
+  const handleReset = () => {
+    setMonthIndex(
+      monthIndex === dayjs().month()
+        ? monthIndex + Math.random()
+        : dayjs().month()
+    );
+  };
+
   return (
     <>
       <Box
@@ -22,6 +46,11 @@ const CalenderHeader = () => {
           alignItems: "center",
           padding: "11px 25px",
           lineHeight: "8px",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: "rgba(255, 255, 255)",
         }}
       >
         {searchMeet ? (
@@ -36,14 +65,30 @@ const CalenderHeader = () => {
                 paddingRight: "30px",
               }}
             >
-              <MenuIcon
+              <Box
                 sx={{
-                  color: "#5f6368",
-                  height: "24px",
-                  width: "24px",
-                  cursor: "pointer"
+                  display: "inline-block",
+                  padding: "8px",
+                  borderRadius: "50%",
+                  transition: "all .2s ease-in-out",
+                  ":hover": {
+                    backgroundColor: "#ddd",
+                  },
                 }}
-              />
+                onClick={handleSidebarToggle}
+              >
+                <MenuIcon
+                  sx={{
+                    color: "#5f6368",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                    ":hover": {
+                      backgroundColor: "#ddd",
+                    },
+                  }}
+                />
+              </Box>
+
               <Box
                 sx={{
                   "&>img": {
@@ -66,7 +111,12 @@ const CalenderHeader = () => {
               </Typography>
             </Box>
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: "19px", ml: 2 }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "19px",
+                ml: 2,
+              }}
             >
               <Typography
                 component="span"
@@ -76,11 +126,11 @@ const CalenderHeader = () => {
                   borderRadius: "4px",
                   fontSize: "14px",
                   fontWeight: 400,
-                  cursor: "pointer"
+                  cursor: "pointer",
                 }}
+                onClick={handleReset}
               >
-                {" "}
-                Today{" "}
+                Today
               </Typography>
               <Box
                 sx={{
@@ -88,12 +138,12 @@ const CalenderHeader = () => {
                   "& > .MuiSvgIcon-root": {
                     fontSize: "24px",
                     color: "rgb(95,99,104)",
-                    cursor: 'pointer',
+                    cursor: "pointer",
                   },
                 }}
               >
-                <ChevronLeftIcon />
-                <ChevronRightIcon />
+                <ChevronLeftIcon onClick={handelDecrement} />
+                <ChevronRightIcon onClick={handelIncrement} />
               </Box>
               <Box>
                 <Typography
@@ -106,7 +156,9 @@ const CalenderHeader = () => {
                     fontWeight: 300,
                   }}
                 >
-                  June 14, 2023
+                  {dayjs(new Date(dayjs().year(), monthIndex)).format(
+                    "MMMM YYYY"
+                  )}
                 </Typography>
               </Box>
             </Box>
